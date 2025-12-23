@@ -1,0 +1,45 @@
+services:
+  mysql-master:
+    image: mysql:8.0.33
+    container_name: mysql-master
+    environment:
+      MYSQL_DATABASE: spring_test
+      MYSQL_ROOT_PASSWORD: 1234
+      TZ: Asia/Seoul
+    ports:
+      - "3306:3306"
+    command:
+      - "--character-set-server=utf8mb4"
+      - "--collation-server=utf8mb4_bin"
+    volumes:
+      - master_data:/var/lib/mysql
+      - ./master/my.cnf:/etc/mysql/conf.d/my.cnf
+    networks:
+      - mysql-net
+
+  mysql-slave:
+    image: mysql:8.0.33
+    container_name: mysql-slave
+    environment:
+      MYSQL_DATABASE: spring_test
+      MYSQL_ROOT_PASSWORD: 1234
+      TZ: Asia/Seoul
+    ports:
+      - "3307:3306"
+    command:
+      - "--character-set-server=utf8mb4"
+      - "--collation-server=utf8mb4_bin"
+    volumes:
+      - slave_data:/var/lib/mysql
+      - ./slave/my.cnf:/etc/mysql/conf.d/my.cnf
+    depends_on:
+      - mysql-master
+    networks:
+      - mysql-net
+
+volumes:
+  master_data:
+  slave_data:
+
+networks:
+  mysql-net:
